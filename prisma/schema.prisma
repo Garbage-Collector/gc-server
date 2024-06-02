@@ -1,0 +1,42 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int      @id @unique @default(autoincrement())
+  email    String   @unique @db.VarChar(50)
+  password String   @db.VarChar(20)
+  nickname String   @unique @db.VarChar(20)
+  Record   Record[]
+}
+
+model Record {
+  id        String   @id @unique @default(uuid()) @db.Uuid
+  title     String   @db.VarChar(300)
+  location  String   @db.VarChar(40)
+  startTime String   @map("start_time")
+  endTime   String   @map("end_time")
+  createdAt DateTime @default(dbgenerated("timezone('Asia/Seoul' :: text, now())")) @map("created_at")
+  content   String   @db.Text
+  userId    Int      @map("user_id")
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  image     Image[]
+}
+
+model Image {
+  id       String @id @unique @default(uuid()) @db.Uuid
+  imageUrl String @map("img_url")
+  recordId String @map("record_id") @db.Uuid
+  Record   Record @relation(fields: [recordId], references: [id], onDelete: Cascade)
+}
