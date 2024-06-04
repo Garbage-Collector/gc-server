@@ -1,11 +1,37 @@
-import { Controller, Delete, Get, Post, Put } from "@nestjs/common";
+import { RecordsCreateRequestDto } from "@gc/records/dtos/records.create.request.dto";
+import { RecordsCreateResponseDto } from "@gc/records/dtos/records.create.response.dto";
+import { RecordsService } from "@gc/records/records.service";
+import { multerOptions } from "@gc/utils/multer.options";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  UploadedFiles,
+  UseInterceptors,
+} from "@nestjs/common";
+import { FilesInterceptor } from "@nestjs/platform-express";
 
-@Controller("records")
+@Controller("/api/records")
 export class RecordsController {
+  constructor(private readonly recordService: RecordsService) {}
+
   // 기록 생성
-  @Post()
-  async createRecord(): Promise<string> {
-    return "기록 생성하기";
+  @Post(":userId")
+  @UseInterceptors(FilesInterceptor("images", 5, multerOptions("images")))
+  async createRecord(
+    @Body() recordsCreateRequestDto: RecordsCreateRequestDto,
+    @UploadedFiles() files: Array<Express.Multer.File>,
+    @Param("userId") userId: string,
+  ): Promise<RecordsCreateResponseDto> {
+    return await this.recordService.createRecord(
+      recordsCreateRequestDto,
+      files,
+      Number.parseInt(userId),
+    );
   }
 
   @Get()
