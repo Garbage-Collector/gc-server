@@ -1,6 +1,7 @@
 import { RecordsCreateRequestDto } from "@gc/records/dtos/records.create.request.dto";
 import { RecordsCreateResponseDto } from "@gc/records/dtos/records.create.response.dto";
 import { RecordsGetAllRecordsResponseDto } from "@gc/records/dtos/records.getAllRecords.response.dto";
+import { RecordsGetRecordsResponseDto } from "@gc/records/dtos/records.getRecords.response.dto";
 import { UploadsService } from "@gc/uploads/uploads.service";
 import { Injectable } from "@nestjs/common";
 import { PrismaClient } from "@prisma/client";
@@ -69,6 +70,34 @@ export class RecordsService {
   }
 
   // 기록 단건 조회
+  async getRecord(
+    userId: number,
+    recordId: string,
+  ): Promise<RecordsGetRecordsResponseDto> {
+    try {
+      const record = await prisma.record.findUnique({
+        where: {
+          userId: userId,
+          id: recordId,
+        },
+        include: {
+          image: {
+            select: {
+              id: true,
+              imageUrl: true,
+            },
+          },
+        },
+      });
+
+      return {
+        record,
+      };
+    } catch (error) {
+      console.log("찾기 실패: ", error);
+      throw new Error("기록 단건 조회 실패...");
+    }
+  }
   // 기록 수정
   // 기록 삭제
 }

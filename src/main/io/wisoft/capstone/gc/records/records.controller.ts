@@ -1,6 +1,7 @@
 import { RecordsCreateRequestDto } from "@gc/records/dtos/records.create.request.dto";
 import { RecordsCreateResponseDto } from "@gc/records/dtos/records.create.response.dto";
 import { RecordsGetAllRecordsResponseDto } from "@gc/records/dtos/records.getAllRecords.response.dto";
+import { RecordsGetRecordsResponseDto } from "@gc/records/dtos/records.getRecords.response.dto";
 import { RecordsService } from "@gc/records/records.service";
 import { multerOptions } from "@gc/utils/multer.options";
 import {
@@ -43,20 +44,26 @@ export class RecordsController {
     return await this.recordService.getAllRecords(Number.parseInt(param));
   }
 
-  @Get()
   // 기록 단건 조회
-  async getRecord(): Promise<string> {
-    return "기록 단건 조회하기";
+  @Get(":userId/:recordId")
+  async getRecord(
+    @Param("userId") userId: string,
+    @Param("recordId") recordId: string,
+  ): Promise<RecordsGetRecordsResponseDto> {
+    return await this.recordService.getRecord(
+      Number.parseInt(userId),
+      recordId,
+    );
   }
 
-  @Put()
   // 기록 수정
+  @Put()
   async updateRecord(): Promise<string> {
     return "기록 수정하기";
   }
 
-  @Delete()
   // 기록 삭제
+  @Delete()
   async removeRecord(): Promise<string> {
     return "기록 삭제하기";
   }
