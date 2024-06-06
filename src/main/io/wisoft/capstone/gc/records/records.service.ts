@@ -1,5 +1,6 @@
 import { RecordsCreateRequestDto } from "@gc/records/dtos/records.create.request.dto";
 import { RecordsCreateResponseDto } from "@gc/records/dtos/records.create.response.dto";
+import { RecordsGetAllRecordsResponseDto } from "@gc/records/dtos/records.getAllRecords.response.dto";
 import { UploadsService } from "@gc/uploads/uploads.service";
 import { Injectable } from "@nestjs/common";
 import { PrismaClient } from "@prisma/client";
@@ -40,6 +41,33 @@ export class RecordsService {
   }
 
   // 기록 다건 조회
+  async getAllRecords(
+    userId: number,
+  ): Promise<RecordsGetAllRecordsResponseDto> {
+    try {
+      const records = await prisma.record.findMany({
+        where: {
+          userId: userId,
+        },
+        include: {
+          image: {
+            select: {
+              id: true,
+              imageUrl: true,
+            },
+          },
+        },
+      });
+
+      return {
+        records,
+      };
+    } catch (error) {
+      console.error("찾기 실패:", error);
+      throw new Error("기록 찾기 실패...");
+    }
+  }
+
   // 기록 단건 조회
   // 기록 수정
   // 기록 삭제
