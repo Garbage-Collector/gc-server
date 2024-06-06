@@ -1,7 +1,7 @@
 import { RecordsCreateRequestDto } from "@gc/records/dtos/records.create.request.dto";
 import { RecordsCreateResponseDto } from "@gc/records/dtos/records.create.response.dto";
 import { RecordsGetAllRecordsResponseDto } from "@gc/records/dtos/records.getAllRecords.response.dto";
-import { RecordsGetRecordsResponseDto } from "@gc/records/dtos/records.getRecords.response.dto";
+import { RecordsGetRecordResponseDto } from "@gc/records/dtos/records.getRecord.response.dto";
 import { UploadsService } from "@gc/uploads/uploads.service";
 import { Injectable } from "@nestjs/common";
 import { PrismaClient } from "@prisma/client";
@@ -73,7 +73,7 @@ export class RecordsService {
   async getRecord(
     userId: number,
     recordId: string,
-  ): Promise<RecordsGetRecordsResponseDto> {
+  ): Promise<RecordsGetRecordResponseDto> {
     try {
       const record = await prisma.record.findUnique({
         where: {
@@ -98,6 +98,23 @@ export class RecordsService {
       throw new Error("기록 단건 조회 실패...");
     }
   }
+
   // 기록 수정
+
   // 기록 삭제
+  async removeRecord(recordId: string): Promise<string> {
+    try {
+      await prisma.record.delete({
+        where: {
+          id: recordId,
+        },
+      });
+
+      return "해당 게시물이 삭제되었습니다.";
+    } catch (error) {
+      // 에러가 발생했을 때 처리할 로직
+      console.error("Error:", error);
+      throw new Error("기록 삭제 실패");
+    }
+  }
 }

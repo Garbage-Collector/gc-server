@@ -84,7 +84,7 @@ class RecordDTO {
   }
 }
 
-export class RecordsGetRecordsResponseDto {
+export class RecordsGetRecordResponseDto {
   @ValidateNested()
   @Type(() => RecordDTO)
   record: RecordDTO | null;
