@@ -14,6 +14,9 @@ import { PrismaClient } from "@prisma/client";
  * */
 const prisma = new PrismaClient();
 
+/**
+ * email 중복 여부 체크 필요
+ * */
 @Injectable()
 export class UsersService {
   async signup(
@@ -33,7 +36,7 @@ export class UsersService {
     }
 
     return {
-      status: HttpStatus.OK,
+      status: HttpStatus.CREATED,
     };
   }
 
