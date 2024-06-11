@@ -1,6 +1,6 @@
 import { IsNotEmpty } from "class-validator";
 
-export class RecordsCreateRequestDto {
+export class RecordsUpdateRequestDto {
   @IsNotEmpty()
   title: string;
 

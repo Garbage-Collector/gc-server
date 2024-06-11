@@ -2,8 +2,10 @@ import { RecordsCreateRequestDto } from "@gc/records/dtos/records.create.request
 import { RecordsCreateResponseDto } from "@gc/records/dtos/records.create.response.dto";
 import { RecordsGetAllRecordsResponseDto } from "@gc/records/dtos/records.getAllRecords.response.dto";
 import { RecordsGetRecordResponseDto } from "@gc/records/dtos/records.getRecord.response.dto";
+import { RecordsHttpStatusDto } from "@gc/records/dtos/records.http.status.dto";
+import { RecordsUpdateRequestDto } from "@gc/records/dtos/records.update.request.dto";
 import { UploadsService } from "@gc/uploads/uploads.service";
-import { Injectable } from "@nestjs/common";
+import { HttpStatus, Injectable } from "@nestjs/common";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -36,8 +38,7 @@ export class RecordsService {
         recordId: record.id,
       };
     } catch (error) {
-      console.error("등록 실패", error);
-      throw error;
+      throw new Error("기록 등록 실패");
     }
   }
 
@@ -60,12 +61,9 @@ export class RecordsService {
         },
       });
 
-      return {
-        records,
-      };
+      return records;
     } catch (error) {
-      console.error("찾기 실패:", error);
-      throw new Error("기록 찾기 실패...");
+      throw new Error("기록 다건 조회 실패");
     }
   }
 
@@ -90,19 +88,52 @@ export class RecordsService {
         },
       });
 
-      return {
-        record,
-      };
+      if (!record) {
+        throw new Error(
+          `기록 단건 조회 실패: userId: ${userId} and recordId: ${recordId}`,
+        );
+      }
+
+      return record;
     } catch (error) {
-      console.log("찾기 실패: ", error);
-      throw new Error("기록 단건 조회 실패...");
+      throw new Error("기록 단건 조회 실패");
     }
   }
 
   // 기록 수정
+  async setRecord(
+    recordId: string,
+    updateRecordsDto: RecordsUpdateRequestDto,
+    files: Express.Multer.File[],
+    statusCode: HttpStatus = HttpStatus.NO_CONTENT,
+  ): Promise<RecordsHttpStatusDto> {
+    try {
+      const updatedRecord = await prisma.record.update({
+        where: {
+          id: recordId,
+        },
+        data: {
+          title: updateRecordsDto.title,
+          location: updateRecordsDto.location,
+          content: updateRecordsDto.content,
+          startTime: updateRecordsDto.startTime,
+          endTime: updateRecordsDto.endTime,
+        },
+      });
+
+      await this.uploadService.updateImg(files, recordId);
+
+      return { status: statusCode };
+    } catch (error) {
+      throw new Error("업데이트 실패");
+    }
+  }
 
   // 기록 삭제
-  async removeRecord(recordId: string): Promise<string> {
+  async removeRecord(
+    recordId: string,
+    statusCode: HttpStatus = HttpStatus.NO_CONTENT,
+  ): Promise<RecordsHttpStatusDto> {
     try {
       await prisma.record.delete({
         where: {
@@ -110,10 +141,8 @@ export class RecordsService {
         },
       });
 
-      return "해당 게시물이 삭제되었습니다.";
+      return { status: statusCode };
     } catch (error) {
-      // 에러가 발생했을 때 처리할 로직
-      console.error("Error:", error);
       throw new Error("기록 삭제 실패");
     }
   }

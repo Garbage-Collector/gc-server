@@ -2,6 +2,8 @@ import { RecordsCreateRequestDto } from "@gc/records/dtos/records.create.request
 import { RecordsCreateResponseDto } from "@gc/records/dtos/records.create.response.dto";
 import { RecordsGetAllRecordsResponseDto } from "@gc/records/dtos/records.getAllRecords.response.dto";
 import { RecordsGetRecordResponseDto } from "@gc/records/dtos/records.getRecord.response.dto";
+import { RecordsHttpStatusDto } from "@gc/records/dtos/records.http.status.dto";
+import { RecordsUpdateRequestDto } from "@gc/records/dtos/records.update.request.dto";
 import { RecordsService } from "@gc/records/records.service";
 import { multerOptions } from "@gc/utils/multer.options";
 import {
@@ -57,14 +59,21 @@ export class RecordsController {
   }
 
   // 기록 수정
-  @Put()
-  async updateRecord(): Promise<string> {
-    return "기록 수정하기";
+  @Put(":recordId")
+  @UseInterceptors(FilesInterceptor("images", 5, multerOptions("images")))
+  async updateRecord(
+    @Param("recordId") recordId: string,
+    @Body() updateRecordDto: RecordsUpdateRequestDto,
+    @UploadedFiles() files: Array<Express.Multer.File>,
+  ): Promise<RecordsHttpStatusDto> {
+    return await this.recordService.setRecord(recordId, updateRecordDto, files);
   }
 
   // 기록 삭제
   @Delete(":recordId")
-  async removeRecord(@Param("recordId") param: string): Promise<string> {
+  async removeRecord(
+    @Param("recordId") param: string,
+  ): Promise<RecordsHttpStatusDto> {
     return await this.recordService.removeRecord(param);
   }
 }
