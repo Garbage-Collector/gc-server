@@ -2,6 +2,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { MulterOptions } from "@nestjs/platform-express/multer/interfaces/multer-options.interface";
 import * as multer from "multer";
+import { v4 as uuid } from "uuid"; // uuid 라이브러리 추가
 
 const createFolder = (folder: string): void => {
   try {
@@ -25,8 +26,10 @@ const storage = (folder: string): multer.StorageEngine => {
 
     filename(req, file, cb) {
       const ext = path.extname(file.originalname);
-      const baseName = path.basename(file.originalname, ext);
-      const fileName = `${baseName}${ext}`;
+      // const baseName = path.basename(file.originalname, ext);
+      // const fileName = `${baseName}${ext}`;
+      const fileName = `${uuid()}${ext}`; // UUID로 파일 이름 설정
+
       cb(null, fileName);
     },
   });
