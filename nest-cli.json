@@ -1,8 +1,14 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "src",
+  "sourceRoot": "src/main/io/wisoft/capstone/gc",
   "compilerOptions": {
-    "deleteOutDir": true
+    "deleteOutDir": true,
+    "assets": [
+      {
+        "include": "uploads/**/*",
+        "outDir": "dist"
+      }
+    ]
   }
 }
