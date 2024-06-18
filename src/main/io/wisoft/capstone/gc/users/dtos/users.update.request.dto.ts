@@ -1,4 +1,4 @@
-export type UsersUpdateRequestDto = {
+export class UsersUpdateRequestDto {
   email: string;
   nickname: string;
-};
+}

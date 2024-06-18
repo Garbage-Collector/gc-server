@@ -1,5 +1,5 @@
 import { HttpStatus } from "@nestjs/common";
 
-export type UsersSignupResponseDto = {
+export class UsersSignupResponseDto {
   status: HttpStatus;
-};
+}

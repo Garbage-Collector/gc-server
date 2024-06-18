@@ -1,4 +1,4 @@
-export type UsersSigninRequestDto = {
+export class UsersSigninRequestDto {
   email: string;
   password: string;
-};
+}

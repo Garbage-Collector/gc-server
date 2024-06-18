@@ -1,3 +1,3 @@
-export type UsersDeleteRequestDto = {
+export class UsersDeleteRequestDto {
   id: number;
-};
+}
