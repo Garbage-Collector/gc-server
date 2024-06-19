@@ -8,8 +8,9 @@ export class UsersPasswordValidationPipe implements PipeTransform {
   ): Promise<UsersSignupRequestDto> {
     const password = usersSignupRequestDto.password;
     const blankPattern = /\s/;
-    const letterNumberSpecialPattern =
-      /[A-Za-z\d~․!@#$%^&*()_\-+=\[\]|\\;:‘“<>,.?/]/;
+    const letterPattern = /[A-Za-z]/;
+    const numberPattern = /\d/;
+    const specialPattern = /[~․!@#$%^&*()_\-+=\[\]|\\;:‘“<>,.?/]/;
 
     if (password.trim() === "") {
       throw new BadRequestException("패스워드는 빈 문자열일 수 없습니다.");
@@ -25,7 +26,11 @@ export class UsersPasswordValidationPipe implements PipeTransform {
       throw new BadRequestException("패스워드에는 공백이 포함될 수 없습니다.");
     }
 
-    if (letterNumberSpecialPattern.test(password)) {
+    if (
+      !letterPattern.test(password) ||
+      !numberPattern.test(password) ||
+      !specialPattern.test(password)
+    ) {
       throw new BadRequestException(
         "패스워드는 영어, 숫자, 특수문자를 반드시 포함해야 합니다.",
       );

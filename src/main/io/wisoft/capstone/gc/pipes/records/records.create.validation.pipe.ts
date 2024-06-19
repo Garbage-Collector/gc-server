@@ -11,6 +11,22 @@ export class RecordsCreateValidationPipe implements PipeTransform {
     const startTime = recordsCreateRequestDto.startTime;
     const endTime = recordsCreateRequestDto.endTime;
 
+    if (!title) {
+      throw new BadRequestException("제목이 정의되지 않았습니다.");
+    }
+
+    if (!location) {
+      throw new BadRequestException("위치가 정의되지 않았습니다.");
+    }
+
+    if (!content) {
+      throw new BadRequestException("내용이 정의되지 않았습니다.");
+    }
+
+    if (!startTime || !endTime) {
+      throw new BadRequestException("시간 정의되지 않았습니다.");
+    }
+
     if (title.length > 50) {
       throw new BadRequestException("제목은 50자 이내여야 합니다.");
     }
