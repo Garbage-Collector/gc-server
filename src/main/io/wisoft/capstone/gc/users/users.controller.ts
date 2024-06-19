@@ -8,10 +8,9 @@ import { UsersUpdateResponseDto } from "@gc/users/dtos/users.update.response.dto
 import { UsersService } from "@gc/users/users.service";
 import { Body, Controller, Delete, Param, Patch, Post } from "@nestjs/common";
 import {
-  ApiBody,
   ApiCreatedResponse,
+  ApiOkResponse,
   ApiOperation,
-  ApiParam,
   ApiTags,
 } from "@nestjs/swagger";
 
@@ -25,6 +24,9 @@ export class UsersController {
     summary: "회원가입",
     description: " email, password, nickname으로 유저 생성 진행",
   })
+  @ApiCreatedResponse({
+    type: UsersSignupResponseDto,
+  })
   async signup(
     @Body() usersSignupDto: UsersSignupRequestDto,
   ): Promise<UsersSignupResponseDto> {
@@ -36,6 +38,10 @@ export class UsersController {
     summary: "로그인",
     description: "아이디와 비밀번호로 유저 로그인 진행, id 반환",
   })
+  @ApiOkResponse({
+    description: "사용자 id, nickname, recordIds[]를 반환",
+    type: UsersSigninResponseDto,
+  })
   async signin(
     @Body() usersSigninDto: UsersSigninRequestDto,
   ): Promise<UsersSigninResponseDto> {
@@ -45,7 +51,11 @@ export class UsersController {
   @Patch("")
   @ApiOperation({
     summary: "수정",
-    description: "user을 수정함",
+    description: "user의 닉네임을 수정",
+  })
+  @ApiOkResponse({
+    description: "수정된 유저 정보를 반환",
+    type: UsersUpdateResponseDto,
   })
   async updateUserNickname(
     @Body() usersUpdateDto: UsersUpdateRequestDto,
@@ -57,6 +67,10 @@ export class UsersController {
   @ApiOperation({
     summary: "유저 삭제",
     description: "id로 유저 삭제",
+  })
+  @ApiOkResponse({
+    description: "삭제된 유저 정보를 반환",
+    type: UsersDeleteResponseDto,
   })
   async deleteUser(@Param("id") id: string): Promise<UsersDeleteResponseDto> {
     return await this.usersService.delete({ id: Number.parseInt(id) });
