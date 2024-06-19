@@ -1,7 +1,7 @@
 import { INestApplication } from "@nestjs/common";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 
-export function setupSwagger(app: INestApplication): void {
+export function swaggerConfig(app: INestApplication): void {
   const config = new DocumentBuilder()
     .setTitle("GC")
     .setDescription("GC API description")
