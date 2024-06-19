@@ -1,4 +1,5 @@
 import { AppModule } from "@gc/app.module";
+import { corsConfig } from "@gc/configure/cors.config";
 import { setupBasicAuth } from "@gc/configure/setupBasicAuth";
 import { setupStaticAssets } from "@gc/configure/static.assets";
 import { setupSwagger } from "@gc/configure/swagger";
@@ -11,6 +12,7 @@ async function bootstrap(): Promise<void> {
   setupBasicAuth(app);
   setupSwagger(app);
   setupStaticAssets(app);
+  corsConfig(app);
 
   await app.listen(3000);
 }
