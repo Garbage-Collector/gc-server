@@ -1,3 +1,4 @@
+import { RecordsCreateValidationPipe } from "@gc/pipes/records/records.create.validation.pipe";
 import { RecordsCreateRequestDto } from "@gc/records/dtos/records.create.request.dto";
 import { RecordsCreateResponseDto } from "@gc/records/dtos/records.create.response.dto";
 import { RecordsGetRecordResponseDto } from "@gc/records/dtos/records.getRecord.response.dto";
@@ -15,6 +16,7 @@ import {
   Put,
   UploadedFiles,
   UseInterceptors,
+  UsePipes,
 } from "@nestjs/common";
 import { FilesInterceptor } from "@nestjs/platform-express";
 import {
@@ -44,7 +46,8 @@ export class RecordsController {
     type: RecordsCreateResponseDto,
   })
   async createRecord(
-    @Body() recordsCreateRequestDto: RecordsCreateRequestDto,
+    @Body(RecordsCreateValidationPipe)
+    recordsCreateRequestDto: RecordsCreateRequestDto,
     @UploadedFiles() files: Array<Express.Multer.File>,
     @Param("userId") userId: string,
   ): Promise<RecordsCreateResponseDto> {
