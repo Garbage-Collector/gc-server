@@ -1,6 +1,5 @@
 import { RecordsCreateRequestDto } from "@gc/records/dtos/records.create.request.dto";
 import { RecordsCreateResponseDto } from "@gc/records/dtos/records.create.response.dto";
-import { RecordsGetAllRecordsResponseDto } from "@gc/records/dtos/records.getAllRecords.response.dto";
 import { RecordsGetRecordResponseDto } from "@gc/records/dtos/records.getRecord.response.dto";
 import { RecordsHttpStatusDto } from "@gc/records/dtos/records.http.status.dto";
 import { RecordsUpdateRequestDto } from "@gc/records/dtos/records.update.request.dto";
@@ -43,11 +42,9 @@ export class RecordsService {
   }
 
   // 기록 다건 조회
-  async getAllRecords(
-    userId: number,
-  ): Promise<RecordsGetAllRecordsResponseDto> {
+  async getAllRecords(userId: number): Promise<RecordsGetRecordResponseDto[]> {
     try {
-      const records = await prisma.record.findMany({
+      return await prisma.record.findMany({
         where: {
           userId: userId,
         },
@@ -60,8 +57,6 @@ export class RecordsService {
           },
         },
       });
-
-      return records;
     } catch (error) {
       throw new Error("기록 다건 조회 실패");
     }
@@ -88,6 +83,7 @@ export class RecordsService {
         },
       });
 
+      // TODO: 수정 필요
       if (!record) {
         throw new Error(
           `기록 단건 조회 실패: userId: ${userId} and recordId: ${recordId}`,
