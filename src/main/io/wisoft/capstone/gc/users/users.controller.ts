@@ -1,3 +1,6 @@
+import { UsersEmailValidationPipe } from "@gc/pipes/users/users.email.validation.pipe";
+import { UsersNicknameValidationPipe } from "@gc/pipes/users/users.nickname.validation.pipe";
+import { UsersPasswordValidationPipe } from "@gc/pipes/users/users.password.validation.pipe";
 import { UsersDeleteResponseDto } from "@gc/users/dtos/users.delete.response.dto";
 import { UsersSigninRequestDto } from "@gc/users/dtos/users.signin.request.dto";
 import { UsersSigninResponseDto } from "@gc/users/dtos/users.signin.response.dto";
@@ -28,7 +31,12 @@ export class UsersController {
     type: UsersSignupResponseDto,
   })
   async signup(
-    @Body() usersSignupDto: UsersSignupRequestDto,
+    @Body(
+      UsersEmailValidationPipe,
+      UsersPasswordValidationPipe,
+      UsersNicknameValidationPipe,
+    )
+    usersSignupDto: UsersSignupRequestDto,
   ): Promise<UsersSignupResponseDto> {
     return await this.usersService.signup(usersSignupDto);
   }
