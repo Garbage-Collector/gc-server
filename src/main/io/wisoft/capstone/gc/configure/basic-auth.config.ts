@@ -1,7 +1,7 @@
 import { NestExpressApplication } from "@nestjs/platform-express";
 import expressBasicAuth from "express-basic-auth";
 
-export function setupBasicAuth(app: NestExpressApplication): void {
+export function basicAuthConfig(app: NestExpressApplication): void {
   const SWAGGER_USER = process.env.SWAGGER_USER;
   const SWAGGER_PASSWORD = process.env.SWAGGER_PASSWORD;
 
