@@ -1,12 +1,13 @@
 import { UsersDeleteRequestDto } from "@gc/users/dtos/users.delete.request.dto";
 import { UsersDeleteResponseDto } from "@gc/users/dtos/users.delete.response.dto";
+import { UsersDuplicateResponseDto } from "@gc/users/dtos/users.duplicate.response.dto";
 import { UsersSigninRequestDto } from "@gc/users/dtos/users.signin.request.dto";
 import { UsersSigninResponseDto } from "@gc/users/dtos/users.signin.response.dto";
 import { UsersSignupRequestDto } from "@gc/users/dtos/users.signup.request.dto";
 import { UsersSignupResponseDto } from "@gc/users/dtos/users.signup.response.dto";
 import { UsersUpdateRequestDto } from "@gc/users/dtos/users.update.request.dto";
 import { UsersUpdateResponseDto } from "@gc/users/dtos/users.update.response.dto";
-import { HttpStatus, Injectable } from "@nestjs/common";
+import { BadRequestException, HttpStatus, Injectable } from "@nestjs/common";
 import { PrismaClient } from "@prisma/client";
 
 /**
@@ -100,6 +101,20 @@ export class UsersService {
     }
 
     return deletedUser;
+  }
+
+  async emailDuplicateCheck(email: string): Promise<UsersDuplicateResponseDto> {
+    const user = await prisma.user.findUnique({ where: { email } });
+
+    return { available: !user };
+  }
+
+  async nicknameDuplicateCheck(
+    nickname: string,
+  ): Promise<UsersDuplicateResponseDto> {
+    const user = await prisma.user.findUnique({ where: { nickname } });
+
+    return { available: !user };
   }
 
   async getIdByEmail(email: string): Promise<number> {
