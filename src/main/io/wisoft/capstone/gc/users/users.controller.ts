@@ -2,6 +2,7 @@ import { UsersEmailValidationPipe } from "@gc/pipes/users/users.email.validation
 import { UsersNicknameValidationPipe } from "@gc/pipes/users/users.nickname.validation.pipe";
 import { UsersPasswordValidationPipe } from "@gc/pipes/users/users.password.validation.pipe";
 import { UsersDeleteResponseDto } from "@gc/users/dtos/users.delete.response.dto";
+import { UsersDuplicateResponseDto } from "@gc/users/dtos/users.duplicate.response.dto";
 import { UsersSigninRequestDto } from "@gc/users/dtos/users.signin.request.dto";
 import { UsersSigninResponseDto } from "@gc/users/dtos/users.signin.response.dto";
 import { UsersSignupRequestDto } from "@gc/users/dtos/users.signup.request.dto";
@@ -9,7 +10,16 @@ import { UsersSignupResponseDto } from "@gc/users/dtos/users.signup.response.dto
 import { UsersUpdateRequestDto } from "@gc/users/dtos/users.update.request.dto";
 import { UsersUpdateResponseDto } from "@gc/users/dtos/users.update.response.dto";
 import { UsersService } from "@gc/users/users.service";
-import { Body, Controller, Delete, Param, Patch, Post } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from "@nestjs/common";
 import {
   ApiCreatedResponse,
   ApiOkResponse,
@@ -82,5 +92,27 @@ export class UsersController {
   })
   async deleteUser(@Param("id") id: string): Promise<UsersDeleteResponseDto> {
     return await this.usersService.delete({ id: Number.parseInt(id) });
+  }
+
+  @Get("/email-check")
+  @ApiOperation({
+    summary: "이메일 중복 조회",
+    description: "이메일 중복 조회",
+  })
+  async emailDuplicateCheck(
+    @Query("email") email: string,
+  ): Promise<UsersDuplicateResponseDto> {
+    return this.usersService.emailDuplicateCheck(email);
+  }
+
+  @Get("/nickname-check")
+  @ApiOperation({
+    summary: "닉네임 중복 조회",
+    description: "닉네임 중복 조회",
+  })
+  async nicknameDuplicateCheck(
+    @Query("nickname") nickname: string,
+  ): Promise<UsersDuplicateResponseDto> {
+    return this.usersService.nicknameDuplicateCheck(nickname);
   }
 }
