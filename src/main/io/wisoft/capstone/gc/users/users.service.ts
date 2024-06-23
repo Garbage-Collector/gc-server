@@ -7,8 +7,9 @@ import { UsersSignupRequestDto } from "@gc/users/dtos/users.signup.request.dto";
 import { UsersSignupResponseDto } from "@gc/users/dtos/users.signup.response.dto";
 import { UsersUpdateRequestDto } from "@gc/users/dtos/users.update.request.dto";
 import { UsersUpdateResponseDto } from "@gc/users/dtos/users.update.response.dto";
-import { BadRequestException, HttpStatus, Injectable } from "@nestjs/common";
+import { HttpStatus, Injectable } from "@nestjs/common";
 import { PrismaClient } from "@prisma/client";
+import * as bcrypt from "bcrypt";
 
 /**
  * 240604: 아래 new PrismaClient() 부분에 대한 처리 고민 필요해보임
@@ -27,7 +28,7 @@ export class UsersService {
       await prisma.user.create({
         data: {
           email: usersSignupRequestDto.email,
-          password: usersSignupRequestDto.password,
+          password: await bcrypt.hash(usersSignupRequestDto.password, 10),
           nickname: usersSignupRequestDto.nickname,
         },
       });
@@ -47,12 +48,20 @@ export class UsersService {
     const user = await prisma.user.findFirst({
       where: {
         email: usersSigninRequestDto.email,
-        password: usersSigninRequestDto.password,
       },
     });
 
     if (!user) {
       throw new Error("User not found");
+    }
+
+    const isValidPassword = await bcrypt.compare(
+      usersSigninRequestDto.password,
+      user.password,
+    );
+
+    if (!isValidPassword) {
+      throw new Error("Wrong password");
     }
 
     const records = await prisma.record.findMany({
