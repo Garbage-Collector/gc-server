@@ -1,3 +1,4 @@
+import { JwtService } from "@gc/auth/jwt/jwt.service";
 import { UsersDeleteRequestDto } from "@gc/users/dtos/users.delete.request.dto";
 import { UsersDeleteResponseDto } from "@gc/users/dtos/users.delete.response.dto";
 import { UsersDuplicateResponseDto } from "@gc/users/dtos/users.duplicate.response.dto";
@@ -21,6 +22,7 @@ const prisma = new PrismaClient();
  * */
 @Injectable()
 export class UsersService {
+  constructor(private readonly jwtService: JwtService) {}
   async signup(
     usersSignupRequestDto: UsersSignupRequestDto,
   ): Promise<UsersSignupResponseDto> {
@@ -70,10 +72,14 @@ export class UsersService {
       },
     });
 
+    const tokens = this.jwtService.returnToken({ email: user.email });
+
     return {
       id: user.id,
       nickname: user.nickname,
       recordIds: records.map((record) => record.id),
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
     };
   }
 
