@@ -24,4 +24,18 @@ export class JwtController {
       accessToken: newToken,
     };
   }
+
+  @Post("token/refresh")
+  @UseGuards(RefreshTokenGuard)
+  async postRefreshToken(
+    @Headers("authorization") rawToken: string,
+  ): Promise<{ refreshToken: string }> {
+    const token = this.authService.extractTokenFromHeader(rawToken, true);
+
+    const newToken = this.authService.rotateToken(token, true);
+
+    return {
+      refreshToken: newToken,
+    };
+  }
 }
