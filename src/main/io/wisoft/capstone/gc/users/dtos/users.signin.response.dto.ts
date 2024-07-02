@@ -27,4 +27,7 @@ export class UsersSigninResponseDto {
     required: true,
   })
   recordIds: string[];
+
+  accessToken: string;
+  refreshToken: string;
 }

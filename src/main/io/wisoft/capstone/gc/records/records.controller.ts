@@ -1,3 +1,4 @@
+import { AccessTokenGuard } from "@gc/auth/guard/bearer-token-guard.service";
 import { RecordsCreateValidationPipe } from "@gc/pipes/records/records.create.validation.pipe";
 import { RecordsCreateRequestDto } from "@gc/records/dtos/records.create.request.dto";
 import { RecordsCreateResponseDto } from "@gc/records/dtos/records.create.response.dto";
@@ -15,8 +16,8 @@ import {
   Post,
   Put,
   UploadedFiles,
+  UseGuards,
   UseInterceptors,
-  UsePipes,
 } from "@nestjs/common";
 import { FilesInterceptor } from "@nestjs/platform-express";
 import {
@@ -36,6 +37,7 @@ export class RecordsController {
   // 기록 생성
   @Post("/:userId")
   @UseInterceptors(FilesInterceptor("images", 5, multerOptions("images")))
+  @UseGuards(AccessTokenGuard)
   @ApiOperation({
     summary: "기록 생성",
     description:
@@ -60,6 +62,7 @@ export class RecordsController {
 
   // 기록 다건 조회
   @Get("/:userId")
+  @UseGuards(AccessTokenGuard)
   @ApiOperation({
     summary: "한 명의 사용자에 대한 기록 조회(多)",
     description:
@@ -83,6 +86,7 @@ export class RecordsController {
 
   // 기록 단건 조회
   @Get("/:userId/:recordId")
+  @UseGuards(AccessTokenGuard)
   @ApiOperation({
     summary: "한 명의 사용자에 대한 기록 조회(少)",
     description: "한 명의 사용자에 대한 하나의 기록을 보여줌",
@@ -114,6 +118,7 @@ export class RecordsController {
   // 기록 수정
   @Put("/:recordId")
   @UseInterceptors(FilesInterceptor("images", 5, multerOptions("images")))
+  @UseGuards(AccessTokenGuard)
   @ApiOperation({
     summary: "기록에 대한 수정",
     description: "기록을 수정할 수 있음",
@@ -129,6 +134,7 @@ export class RecordsController {
 
   // 기록 삭제
   @Delete("/:recordId")
+  @UseGuards(AccessTokenGuard)
   @ApiOperation({
     summary: "기록 삭제",
     description: "한 명의 사용자에 대한 기록을 지움",

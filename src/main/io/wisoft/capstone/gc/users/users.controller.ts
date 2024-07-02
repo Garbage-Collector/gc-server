@@ -1,3 +1,4 @@
+import { AccessTokenGuard } from "@gc/auth/guard/bearer-token-guard.service";
 import { UsersEmailValidationPipe } from "@gc/pipes/users/users.email.validation.pipe";
 import { UsersNicknameValidationPipe } from "@gc/pipes/users/users.nickname.validation.pipe";
 import { UsersPasswordValidationPipe } from "@gc/pipes/users/users.password.validation.pipe";
@@ -19,6 +20,7 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from "@nestjs/common";
 import {
   ApiCreatedResponse,
@@ -67,6 +69,7 @@ export class UsersController {
   }
 
   @Patch("")
+  @UseGuards(AccessTokenGuard)
   @ApiOperation({
     summary: "수정",
     description: "user의 닉네임을 수정",
@@ -82,6 +85,7 @@ export class UsersController {
   }
 
   @Delete("/:id")
+  @UseGuards(AccessTokenGuard)
   @ApiOperation({
     summary: "유저 삭제",
     description: "id로 유저 삭제",
