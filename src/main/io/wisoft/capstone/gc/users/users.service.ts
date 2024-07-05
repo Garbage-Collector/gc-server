@@ -17,9 +17,6 @@ import * as bcrypt from "bcrypt";
  * */
 const prisma = new PrismaClient();
 
-/**
- * email 중복 여부 체크 필요
- * */
 @Injectable()
 export class UsersService {
   constructor(private readonly jwtService: JwtService) {}
