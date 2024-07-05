@@ -12,6 +12,8 @@ import { UsersUpdateNicknameRequestDto } from "@gc/users/dtos/users.update.nickn
 import { UsersUpdateNicknameResponseDto } from "@gc/users/dtos/users.update.nickname.response.dto";
 import { UsersUpdatePasswordRequestDto } from "@gc/users/dtos/users.update.password.request.dto";
 import { UsersUpdatePasswordResponseDto } from "@gc/users/dtos/users.update.password.response.dto";
+import { UsersVerifyPasswordRequestDto } from "@gc/users/dtos/users.verify.password.request.dto";
+import { UsersVerifyPasswordResponseDto } from "@gc/users/dtos/users.verify.password.response.dto";
 import { UsersService } from "@gc/users/users.service";
 import {
   Body,
@@ -108,6 +110,23 @@ export class UsersController {
     @Headers("authorization") rawToken: string,
   ): Promise<UsersUpdatePasswordResponseDto> {
     return await this.usersService.updatePassword(usersUpdateDto, rawToken);
+  }
+
+  @Post("password-check")
+  @UseGuards(AccessTokenGuard)
+  @ApiOperation({
+    summary: "확인",
+    description: "user의 비밀번호를 확인",
+  })
+  @ApiOkResponse({
+    description: "확인된 정보를 반환",
+    type: UsersVerifyPasswordResponseDto,
+  })
+  async verifyPassword(
+    @Body() usersUpdateDto: UsersVerifyPasswordRequestDto,
+    @Headers("authorization") rawToken: string,
+  ): Promise<UsersVerifyPasswordResponseDto> {
+    return await this.usersService.verifyPassword(usersUpdateDto, rawToken);
   }
 
   @Delete("/:id")

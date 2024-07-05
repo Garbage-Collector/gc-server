@@ -10,6 +10,8 @@ import { UsersUpdateNicknameRequestDto } from "@gc/users/dtos/users.update.nickn
 import { UsersUpdateNicknameResponseDto } from "@gc/users/dtos/users.update.nickname.response.dto";
 import { UsersUpdatePasswordRequestDto } from "@gc/users/dtos/users.update.password.request.dto";
 import { UsersUpdatePasswordResponseDto } from "@gc/users/dtos/users.update.password.response.dto";
+import { UsersVerifyPasswordRequestDto } from "@gc/users/dtos/users.verify.password.request.dto";
+import { UsersVerifyPasswordResponseDto } from "@gc/users/dtos/users.verify.password.response.dto";
 import { HttpStatus, Injectable } from "@nestjs/common";
 import { PrismaClient } from "@prisma/client";
 import * as bcrypt from "bcrypt";
@@ -156,20 +158,24 @@ export class UsersService {
     return { available: !user };
   }
 
-  async getIdByEmail(email: string): Promise<number> {
-    const user = await prisma.user.findUnique({
-      where: {
-        email: email,
-      },
-      select: {
-        id: true,
-      },
-    });
+  async verifyPassword(
+    usersVerifyPasswordRequestDto: UsersVerifyPasswordRequestDto,
+    rawToken: string,
+  ): Promise<UsersVerifyPasswordResponseDto> {
+    const email = this.jwtService.extractEmailFromToken(rawToken);
+    const user = await prisma.user.findUnique({ where: { email } });
 
     if (!user) {
       throw new Error("User not found");
     }
 
-    return user.id;
+    const isVerifiedPassword = await bcrypt.compare(
+      usersVerifyPasswordRequestDto.password,
+      user.password,
+    );
+
+    return {
+      verified: isVerifiedPassword,
+    };
   }
 }
