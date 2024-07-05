@@ -10,8 +10,10 @@ import { UsersUpdateNicknameRequestDto } from "@gc/users/dtos/users.update.nickn
 import { UsersUpdateNicknameResponseDto } from "@gc/users/dtos/users.update.nickname.response.dto";
 import { UsersUpdatePasswordRequestDto } from "@gc/users/dtos/users.update.password.request.dto";
 import { UsersUpdatePasswordResponseDto } from "@gc/users/dtos/users.update.password.response.dto";
+import { UsersUpdateProfileResponseDto } from "@gc/users/dtos/users.update.profile.response.dto";
 import { UsersVerifyPasswordRequestDto } from "@gc/users/dtos/users.verify.password.request.dto";
 import { UsersVerifyPasswordResponseDto } from "@gc/users/dtos/users.verify.password.response.dto";
+import { copyToSrcUpload } from "@gc/utils/image.copy";
 import { HttpStatus, Injectable } from "@nestjs/common";
 import { PrismaClient } from "@prisma/client";
 import * as bcrypt from "bcrypt";
@@ -125,6 +127,36 @@ export class UsersService {
 
     return {
       password: updatedUser.password,
+    };
+  }
+
+  async updateProfileImage(
+    file: Express.Multer.File,
+    rawToken: string,
+  ): Promise<UsersUpdateProfileResponseDto> {
+    const fileName = `/media/images/${file.filename}`;
+
+    try {
+      await copyToSrcUpload(file.filename);
+    } catch (error) {
+      console.error("이미지 복사 실패", error);
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: {
+        email: this.jwtService.extractEmailFromToken(rawToken),
+      },
+      data: {
+        profile: fileName,
+      },
+    });
+
+    if (!updatedUser) {
+      throw new Error("User not found");
+    }
+
+    return {
+      profile: updatedUser.profile,
     };
   }
 
