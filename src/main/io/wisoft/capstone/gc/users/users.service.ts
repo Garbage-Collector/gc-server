@@ -6,8 +6,10 @@ import { UsersSigninRequestDto } from "@gc/users/dtos/users.signin.request.dto";
 import { UsersSigninResponseDto } from "@gc/users/dtos/users.signin.response.dto";
 import { UsersSignupRequestDto } from "@gc/users/dtos/users.signup.request.dto";
 import { UsersSignupResponseDto } from "@gc/users/dtos/users.signup.response.dto";
-import { UsersUpdateRequestDto } from "@gc/users/dtos/users.update.request.dto";
-import { UsersUpdateResponseDto } from "@gc/users/dtos/users.update.response.dto";
+import { UsersUpdateNicknameRequestDto } from "@gc/users/dtos/users.update.nickname.request.dto";
+import { UsersUpdateNicknameResponseDto } from "@gc/users/dtos/users.update.nickname.response.dto";
+import { UsersUpdatePasswordRequestDto } from "@gc/users/dtos/users.update.password.request.dto";
+import { UsersUpdatePasswordResponseDto } from "@gc/users/dtos/users.update.password.response.dto";
 import { HttpStatus, Injectable } from "@nestjs/common";
 import { PrismaClient } from "@prisma/client";
 import * as bcrypt from "bcrypt";
@@ -81,17 +83,15 @@ export class UsersService {
   }
 
   async updateNickname(
-    usersUpdateRequestDto: UsersUpdateRequestDto,
+    usersUpdateNicknameRequestDto: UsersUpdateNicknameRequestDto,
     rawToken: string,
-  ): Promise<UsersUpdateResponseDto> {
+  ): Promise<UsersUpdateNicknameResponseDto> {
     const updatedUser = await prisma.user.update({
       where: {
-        id: await this.getIdByEmail(
-          this.jwtService.extractEmailFromToken(rawToken),
-        ),
+        email: this.jwtService.extractEmailFromToken(rawToken),
       },
       data: {
-        nickname: usersUpdateRequestDto.nickname,
+        nickname: usersUpdateNicknameRequestDto.nickname,
       },
     });
 
@@ -101,6 +101,28 @@ export class UsersService {
 
     return {
       nickname: updatedUser.nickname,
+    };
+  }
+
+  async updatePassword(
+    usersUpdatePasswordRequestDto: UsersUpdatePasswordRequestDto,
+    rawToken: string,
+  ): Promise<UsersUpdatePasswordResponseDto> {
+    const updatedUser = await prisma.user.update({
+      where: {
+        email: this.jwtService.extractEmailFromToken(rawToken),
+      },
+      data: {
+        password: await bcrypt.hash(usersUpdatePasswordRequestDto.password, 10),
+      },
+    });
+
+    if (!updatedUser) {
+      throw new Error("User not found");
+    }
+
+    return {
+      password: updatedUser.password,
     };
   }
 

@@ -8,8 +8,10 @@ import { UsersSigninRequestDto } from "@gc/users/dtos/users.signin.request.dto";
 import { UsersSigninResponseDto } from "@gc/users/dtos/users.signin.response.dto";
 import { UsersSignupRequestDto } from "@gc/users/dtos/users.signup.request.dto";
 import { UsersSignupResponseDto } from "@gc/users/dtos/users.signup.response.dto";
-import { UsersUpdateRequestDto } from "@gc/users/dtos/users.update.request.dto";
-import { UsersUpdateResponseDto } from "@gc/users/dtos/users.update.response.dto";
+import { UsersUpdateNicknameRequestDto } from "@gc/users/dtos/users.update.nickname.request.dto";
+import { UsersUpdateNicknameResponseDto } from "@gc/users/dtos/users.update.nickname.response.dto";
+import { UsersUpdatePasswordRequestDto } from "@gc/users/dtos/users.update.password.request.dto";
+import { UsersUpdatePasswordResponseDto } from "@gc/users/dtos/users.update.password.response.dto";
 import { UsersService } from "@gc/users/users.service";
 import {
   Body,
@@ -17,6 +19,9 @@ import {
   Delete,
   Get,
   Headers,
+  HttpException,
+  HttpStatus,
+  NotFoundException,
   Param,
   Patch,
   Post,
@@ -66,7 +71,9 @@ export class UsersController {
   async signin(
     @Body() usersSigninDto: UsersSigninRequestDto,
   ): Promise<UsersSigninResponseDto> {
-    return await this.usersService.signin(usersSigninDto);
+    return this.usersService.signin(usersSigninDto).catch((e) => {
+      throw new NotFoundException(e.message);
+    });
   }
 
   @Patch("nickname")
@@ -76,14 +83,31 @@ export class UsersController {
     description: "user의 닉네임을 수정",
   })
   @ApiOkResponse({
-    description: "수정된 유저 정보를 반환",
-    type: UsersUpdateResponseDto,
+    description: "수정된 유저 닉네임을 반환",
+    type: UsersUpdateNicknameResponseDto,
   })
   async updateUserNickname(
-    @Body() usersUpdateDto: UsersUpdateRequestDto,
+    @Body() usersUpdateDto: UsersUpdateNicknameRequestDto,
     @Headers("authorization") rawToken: string,
-  ): Promise<UsersUpdateResponseDto> {
+  ): Promise<UsersUpdateNicknameResponseDto> {
     return await this.usersService.updateNickname(usersUpdateDto, rawToken);
+  }
+
+  @Patch("password")
+  @UseGuards(AccessTokenGuard)
+  @ApiOperation({
+    summary: "수정",
+    description: "user의 비밀번호를 수정",
+  })
+  @ApiOkResponse({
+    description: "수정된 비밀번호를 반환",
+    type: UsersUpdateNicknameResponseDto,
+  })
+  async updateUserPassword(
+    @Body() usersUpdateDto: UsersUpdatePasswordRequestDto,
+    @Headers("authorization") rawToken: string,
+  ): Promise<UsersUpdatePasswordResponseDto> {
+    return await this.usersService.updatePassword(usersUpdateDto, rawToken);
   }
 
   @Delete("/:id")
