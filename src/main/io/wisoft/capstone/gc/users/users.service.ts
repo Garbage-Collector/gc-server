@@ -82,10 +82,13 @@ export class UsersService {
 
   async updateNickname(
     usersUpdateRequestDto: UsersUpdateRequestDto,
+    rawToken: string,
   ): Promise<UsersUpdateResponseDto> {
     const updatedUser = await prisma.user.update({
       where: {
-        id: await this.getIdByEmail(usersUpdateRequestDto.email),
+        id: await this.getIdByEmail(
+          this.jwtService.extractEmailFromToken(rawToken),
+        ),
       },
       data: {
         nickname: usersUpdateRequestDto.nickname,
@@ -96,7 +99,9 @@ export class UsersService {
       throw new Error("User not found");
     }
 
-    return updatedUser;
+    return {
+      nickname: updatedUser.nickname,
+    };
   }
 
   async delete(

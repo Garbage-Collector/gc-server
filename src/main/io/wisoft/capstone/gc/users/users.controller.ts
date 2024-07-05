@@ -16,6 +16,7 @@ import {
   Controller,
   Delete,
   Get,
+  Headers,
   Param,
   Patch,
   Post,
@@ -68,7 +69,7 @@ export class UsersController {
     return await this.usersService.signin(usersSigninDto);
   }
 
-  @Patch("")
+  @Patch("nickname")
   @UseGuards(AccessTokenGuard)
   @ApiOperation({
     summary: "수정",
@@ -80,8 +81,9 @@ export class UsersController {
   })
   async updateUserNickname(
     @Body() usersUpdateDto: UsersUpdateRequestDto,
+    @Headers("authorization") rawToken: string,
   ): Promise<UsersUpdateResponseDto> {
-    return await this.usersService.updateNickname(usersUpdateDto);
+    return await this.usersService.updateNickname(usersUpdateDto, rawToken);
   }
 
   @Delete("/:id")
