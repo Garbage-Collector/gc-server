@@ -71,4 +71,10 @@ export class JwtService {
       isRefreshToken,
     );
   }
+
+  extractEmailFromToken(rawToken: string): string {
+    return this.jwtService.verify(this.extractTokenFromHeader(rawToken, true), {
+      secret: process.env.JWT_SECRET,
+    }).email;
+  }
 }

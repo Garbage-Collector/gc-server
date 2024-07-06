@@ -8,20 +8,31 @@ import { UsersSigninRequestDto } from "@gc/users/dtos/users.signin.request.dto";
 import { UsersSigninResponseDto } from "@gc/users/dtos/users.signin.response.dto";
 import { UsersSignupRequestDto } from "@gc/users/dtos/users.signup.request.dto";
 import { UsersSignupResponseDto } from "@gc/users/dtos/users.signup.response.dto";
-import { UsersUpdateRequestDto } from "@gc/users/dtos/users.update.request.dto";
-import { UsersUpdateResponseDto } from "@gc/users/dtos/users.update.response.dto";
+import { UsersUpdateNicknameRequestDto } from "@gc/users/dtos/users.update.nickname.request.dto";
+import { UsersUpdateNicknameResponseDto } from "@gc/users/dtos/users.update.nickname.response.dto";
+import { UsersUpdatePasswordRequestDto } from "@gc/users/dtos/users.update.password.request.dto";
+import { UsersUpdatePasswordResponseDto } from "@gc/users/dtos/users.update.password.response.dto";
+import { UsersUpdateProfileResponseDto } from "@gc/users/dtos/users.update.profile.response.dto";
+import { UsersVerifyPasswordRequestDto } from "@gc/users/dtos/users.verify.password.request.dto";
+import { UsersVerifyPasswordResponseDto } from "@gc/users/dtos/users.verify.password.response.dto";
 import { UsersService } from "@gc/users/users.service";
+import { multerOptions } from "@gc/utils/multer.options";
 import {
   Body,
   Controller,
   Delete,
   Get,
+  Headers,
+  NotFoundException,
   Param,
   Patch,
   Post,
   Query,
+  UploadedFiles,
   UseGuards,
+  UseInterceptors,
 } from "@nestjs/common";
+import { FilesInterceptor } from "@nestjs/platform-express";
 import {
   ApiCreatedResponse,
   ApiOkResponse,
@@ -65,23 +76,60 @@ export class UsersController {
   async signin(
     @Body() usersSigninDto: UsersSigninRequestDto,
   ): Promise<UsersSigninResponseDto> {
-    return await this.usersService.signin(usersSigninDto);
+    return this.usersService.signin(usersSigninDto).catch((e) => {
+      throw new NotFoundException(e.message);
+    });
   }
 
-  @Patch("")
+  @Patch("nickname")
   @UseGuards(AccessTokenGuard)
   @ApiOperation({
     summary: "수정",
     description: "user의 닉네임을 수정",
   })
   @ApiOkResponse({
-    description: "수정된 유저 정보를 반환",
-    type: UsersUpdateResponseDto,
+    description: "수정된 유저 닉네임을 반환",
+    type: UsersUpdateNicknameResponseDto,
   })
   async updateUserNickname(
-    @Body() usersUpdateDto: UsersUpdateRequestDto,
-  ): Promise<UsersUpdateResponseDto> {
-    return await this.usersService.updateNickname(usersUpdateDto);
+    @Body() usersUpdateDto: UsersUpdateNicknameRequestDto,
+    @Headers("authorization") rawToken: string,
+  ): Promise<UsersUpdateNicknameResponseDto> {
+    return await this.usersService.updateNickname(usersUpdateDto, rawToken);
+  }
+
+  @Patch("password")
+  @UseGuards(AccessTokenGuard)
+  @ApiOperation({
+    summary: "수정",
+    description: "user의 비밀번호를 수정",
+  })
+  @ApiOkResponse({
+    description: "수정된 비밀번호를 반환",
+    type: UsersUpdateNicknameResponseDto,
+  })
+  async updateUserPassword(
+    @Body() usersUpdateDto: UsersUpdatePasswordRequestDto,
+    @Headers("authorization") rawToken: string,
+  ): Promise<UsersUpdatePasswordResponseDto> {
+    return await this.usersService.updatePassword(usersUpdateDto, rawToken);
+  }
+
+  @Post("password-check")
+  @UseGuards(AccessTokenGuard)
+  @ApiOperation({
+    summary: "확인",
+    description: "user의 비밀번호를 확인",
+  })
+  @ApiOkResponse({
+    description: "확인된 정보를 반환",
+    type: UsersVerifyPasswordResponseDto,
+  })
+  async verifyPassword(
+    @Body() usersUpdateDto: UsersVerifyPasswordRequestDto,
+    @Headers("authorization") rawToken: string,
+  ): Promise<UsersVerifyPasswordResponseDto> {
+    return await this.usersService.verifyPassword(usersUpdateDto, rawToken);
   }
 
   @Delete("/:id")
@@ -118,5 +166,21 @@ export class UsersController {
     @Query("nickname") nickname: string,
   ): Promise<UsersDuplicateResponseDto> {
     return this.usersService.nicknameDuplicateCheck(nickname);
+  }
+
+  @Patch("/profile-image")
+  @UseInterceptors(
+    FilesInterceptor("profile-image", 1, multerOptions("images")),
+  )
+  @UseGuards(AccessTokenGuard)
+  @ApiOperation({
+    summary: "유저 프로필 이미지 수정",
+    description: "유저 프로필 이미지 수정",
+  })
+  async updateProfileImage(
+    @UploadedFiles() file: Array<Express.Multer.File>,
+    @Headers("authorization") rawToken: string,
+  ): Promise<UsersUpdateProfileResponseDto> {
+    return await this.usersService.updateProfileImage(file[0], rawToken);
   }
 }

@@ -6,8 +6,14 @@ import { UsersSigninRequestDto } from "@gc/users/dtos/users.signin.request.dto";
 import { UsersSigninResponseDto } from "@gc/users/dtos/users.signin.response.dto";
 import { UsersSignupRequestDto } from "@gc/users/dtos/users.signup.request.dto";
 import { UsersSignupResponseDto } from "@gc/users/dtos/users.signup.response.dto";
-import { UsersUpdateRequestDto } from "@gc/users/dtos/users.update.request.dto";
-import { UsersUpdateResponseDto } from "@gc/users/dtos/users.update.response.dto";
+import { UsersUpdateNicknameRequestDto } from "@gc/users/dtos/users.update.nickname.request.dto";
+import { UsersUpdateNicknameResponseDto } from "@gc/users/dtos/users.update.nickname.response.dto";
+import { UsersUpdatePasswordRequestDto } from "@gc/users/dtos/users.update.password.request.dto";
+import { UsersUpdatePasswordResponseDto } from "@gc/users/dtos/users.update.password.response.dto";
+import { UsersUpdateProfileResponseDto } from "@gc/users/dtos/users.update.profile.response.dto";
+import { UsersVerifyPasswordRequestDto } from "@gc/users/dtos/users.verify.password.request.dto";
+import { UsersVerifyPasswordResponseDto } from "@gc/users/dtos/users.verify.password.response.dto";
+import { copyToSrcUpload } from "@gc/utils/image.copy";
 import { HttpStatus, Injectable } from "@nestjs/common";
 import { PrismaClient } from "@prisma/client";
 import * as bcrypt from "bcrypt";
@@ -17,9 +23,6 @@ import * as bcrypt from "bcrypt";
  * */
 const prisma = new PrismaClient();
 
-/**
- * email 중복 여부 체크 필요
- * */
 @Injectable()
 export class UsersService {
   constructor(private readonly jwtService: JwtService) {}
@@ -84,14 +87,15 @@ export class UsersService {
   }
 
   async updateNickname(
-    usersUpdateRequestDto: UsersUpdateRequestDto,
-  ): Promise<UsersUpdateResponseDto> {
+    usersUpdateNicknameRequestDto: UsersUpdateNicknameRequestDto,
+    rawToken: string,
+  ): Promise<UsersUpdateNicknameResponseDto> {
     const updatedUser = await prisma.user.update({
       where: {
-        id: await this.getIdByEmail(usersUpdateRequestDto.email),
+        email: this.jwtService.extractEmailFromToken(rawToken),
       },
       data: {
-        nickname: usersUpdateRequestDto.nickname,
+        nickname: usersUpdateNicknameRequestDto.nickname,
       },
     });
 
@@ -99,7 +103,61 @@ export class UsersService {
       throw new Error("User not found");
     }
 
-    return updatedUser;
+    return {
+      nickname: updatedUser.nickname,
+    };
+  }
+
+  async updatePassword(
+    usersUpdatePasswordRequestDto: UsersUpdatePasswordRequestDto,
+    rawToken: string,
+  ): Promise<UsersUpdatePasswordResponseDto> {
+    const updatedUser = await prisma.user.update({
+      where: {
+        email: this.jwtService.extractEmailFromToken(rawToken),
+      },
+      data: {
+        password: await bcrypt.hash(usersUpdatePasswordRequestDto.password, 10),
+      },
+    });
+
+    if (!updatedUser) {
+      throw new Error("User not found");
+    }
+
+    return {
+      password: updatedUser.password,
+    };
+  }
+
+  async updateProfileImage(
+    file: Express.Multer.File,
+    rawToken: string,
+  ): Promise<UsersUpdateProfileResponseDto> {
+    const fileName = `/media/images/${file.filename}`;
+
+    try {
+      await copyToSrcUpload(file.filename);
+    } catch (error) {
+      console.error("이미지 복사 실패", error);
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: {
+        email: this.jwtService.extractEmailFromToken(rawToken),
+      },
+      data: {
+        profile: fileName,
+      },
+    });
+
+    if (!updatedUser) {
+      throw new Error("User not found");
+    }
+
+    return {
+      profile: updatedUser.profile,
+    };
   }
 
   async delete(
@@ -132,20 +190,24 @@ export class UsersService {
     return { available: !user };
   }
 
-  async getIdByEmail(email: string): Promise<number> {
-    const user = await prisma.user.findUnique({
-      where: {
-        email: email,
-      },
-      select: {
-        id: true,
-      },
-    });
+  async verifyPassword(
+    usersVerifyPasswordRequestDto: UsersVerifyPasswordRequestDto,
+    rawToken: string,
+  ): Promise<UsersVerifyPasswordResponseDto> {
+    const email = this.jwtService.extractEmailFromToken(rawToken);
+    const user = await prisma.user.findUnique({ where: { email } });
 
     if (!user) {
       throw new Error("User not found");
     }
 
-    return user.id;
+    const isVerifiedPassword = await bcrypt.compare(
+      usersVerifyPasswordRequestDto.password,
+      user.password,
+    );
+
+    return {
+      verified: isVerifiedPassword,
+    };
   }
 }
