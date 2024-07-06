@@ -15,6 +15,7 @@ import {
   Param,
   Post,
   Put,
+  Req,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
@@ -28,6 +29,7 @@ import {
   ApiTags,
 } from "@nestjs/swagger";
 import { ApiNoContentResponse } from "@nestjs/swagger/dist/decorators/api-response.decorator";
+import { Request } from "express";
 
 @Controller("/api/records")
 @ApiTags("Records API")
@@ -48,6 +50,7 @@ export class RecordsController {
     type: RecordsCreateResponseDto,
   })
   async createRecord(
+    @Req() req: Request,
     @Body(RecordsCreateValidationPipe)
     recordsCreateRequestDto: RecordsCreateRequestDto,
     @UploadedFiles() files: Array<Express.Multer.File>,
@@ -57,6 +60,7 @@ export class RecordsController {
       recordsCreateRequestDto,
       files,
       Number.parseInt(userId),
+      req.headers["content-type"] || "",
     );
   }
 
