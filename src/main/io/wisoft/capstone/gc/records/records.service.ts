@@ -20,7 +20,7 @@ export class RecordsService {
     user: number,
     contentType: string,
   ): Promise<RecordsCreateResponseDto> {
-    if (contentType !== "multipart/form-data") {
+    if (!contentType.includes("multipart/form-data")) {
       throw new BadRequestException(
         "Content-Type은 form-data로 진행해 주세요.",
       );
