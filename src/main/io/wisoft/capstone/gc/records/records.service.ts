@@ -4,7 +4,7 @@ import { RecordsGetRecordResponseDto } from "@gc/records/dtos/records.getRecord.
 import { RecordsHttpStatusDto } from "@gc/records/dtos/records.http.status.dto";
 import { RecordsUpdateRequestDto } from "@gc/records/dtos/records.update.request.dto";
 import { UploadsService } from "@gc/uploads/uploads.service";
-import { HttpStatus, Injectable } from "@nestjs/common";
+import { BadRequestException, HttpStatus, Injectable } from "@nestjs/common";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -18,7 +18,14 @@ export class RecordsService {
     createRecordDto: RecordsCreateRequestDto,
     files: Express.Multer.File[],
     user: number,
+    contentType: string,
   ): Promise<RecordsCreateResponseDto> {
+    if (!contentType.includes("multipart/form-data")) {
+      throw new BadRequestException(
+        "Content-Type은 form-data로 진행해 주세요.",
+      );
+    }
+
     try {
       const record = await prisma.record.create({
         data: {
