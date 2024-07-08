@@ -30,4 +30,5 @@ export class UsersSigninResponseDto {
 
   accessToken: string;
   refreshToken: string;
+  "profile-image": string;
 }

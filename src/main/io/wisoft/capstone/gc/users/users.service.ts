@@ -83,6 +83,7 @@ export class UsersService {
       recordIds: records.map((record) => record.id),
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
+      "profile-image": user.profile,
     };
   }
 
