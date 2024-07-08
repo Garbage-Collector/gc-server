@@ -80,6 +80,7 @@ export class UsersService {
     return {
       id: user.id,
       nickname: user.nickname,
+      "profile-image": user.profile,
       recordIds: records.map((record) => record.id),
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
@@ -156,7 +157,7 @@ export class UsersService {
     }
 
     return {
-      profile: updatedUser.profile,
+      "profile-image": updatedUser.profile,
     };
   }
 
