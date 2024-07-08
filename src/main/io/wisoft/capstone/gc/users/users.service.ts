@@ -157,7 +157,7 @@ export class UsersService {
     }
 
     return {
-      profile: updatedUser.profile,
+      "profile-image": updatedUser.profile,
     };
   }
 
