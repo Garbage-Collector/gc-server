@@ -9,11 +9,18 @@ export class UsersSigninResponseDto {
   id: number;
 
   @ApiProperty({
-    example: "iamgc2",
+    example: "nickname",
     description: "nickname",
     required: true,
   })
   nickname: string;
+
+  @ApiProperty({
+    example: "profile image url",
+    description: "profile image url",
+    required: true,
+  })
+  "profile-image": string;
 
   @ApiProperty({
     example:

@@ -6,5 +6,5 @@ export class UsersUpdateProfileResponseDto {
     description: "profile-image url",
     required: true,
   })
-  profile: string;
+  "profile-image": string;
 }
