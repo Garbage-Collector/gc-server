@@ -80,10 +80,10 @@ export class UsersService {
     return {
       id: user.id,
       nickname: user.nickname,
+      "profile-image": user.profile,
       recordIds: records.map((record) => record.id),
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
-      "profile-image": user.profile,
     };
   }
 
