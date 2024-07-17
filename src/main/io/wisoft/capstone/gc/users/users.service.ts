@@ -6,6 +6,7 @@ import { UsersSigninRequestDto } from "@gc/users/dtos/users.signin.request.dto";
 import { UsersSigninResponseDto } from "@gc/users/dtos/users.signin.response.dto";
 import { UsersSignupRequestDto } from "@gc/users/dtos/users.signup.request.dto";
 import { UsersSignupResponseDto } from "@gc/users/dtos/users.signup.response.dto";
+import { UserSocialSignupRequestDto } from "@gc/users/dtos/users.social.signup.request.dto";
 import { UsersUpdateNicknameRequestDto } from "@gc/users/dtos/users.update.nickname.request.dto";
 import { UsersUpdateNicknameResponseDto } from "@gc/users/dtos/users.update.nickname.response.dto";
 import { UsersUpdatePasswordRequestDto } from "@gc/users/dtos/users.update.password.request.dto";
@@ -45,6 +46,30 @@ export class UsersService {
     return {
       status: HttpStatus.CREATED,
     };
+  }
+
+  /**
+   * 240715: return Promise<UserSocialSignupResponseDto> 부분 수정 필요
+   * Provider 부분에서 에러 발생
+   * + unique nickname 부분 처리 필요
+   * */
+  async socialSignup(socialSignup: UserSocialSignupRequestDto) {
+    try {
+      return await prisma.user.create({
+        data: {
+          email: socialSignup.email,
+          nickname: socialSignup.displayName,
+          password: "socialSignup",
+          externalId: socialSignup.externalId,
+          socialProvider: socialSignup.socialProvider,
+          socialRefreshToken: socialSignup.socialRefreshToken,
+          isSocialAccount: socialSignup.isSocialAccount,
+        },
+      });
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   }
 
   async signin(
@@ -161,6 +186,23 @@ export class UsersService {
     };
   }
 
+  async updateSocialRefreshToken(email: string, refreshToken: string) {
+    const updatedUser = await prisma.user.update({
+      where: {
+        email: email,
+      },
+      data: {
+        socialRefreshToken: refreshToken,
+      },
+    });
+
+    if (!updatedUser) {
+      throw new Error("User not found");
+    }
+
+    return updatedUser;
+  }
+
   async delete(
     usersDeleteRequestDto: UsersDeleteRequestDto,
   ): Promise<UsersDeleteResponseDto> {
@@ -175,6 +217,16 @@ export class UsersService {
     }
 
     return deletedUser;
+  }
+
+  async findUserByEmail(email: string) {
+    return prisma.user.findUnique({ where: { email } });
+  }
+
+  async findUserByExternalId(externalId: string) {
+    return prisma.user.findUnique({
+      where: { externalId },
+    });
   }
 
   async emailDuplicateCheck(email: string): Promise<UsersDuplicateResponseDto> {

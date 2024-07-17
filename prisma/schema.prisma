@@ -14,12 +14,16 @@ datasource db {
 }
 
 model User {
-  id       Int      @id @unique @default(autoincrement())
-  email    String   @unique @db.VarChar(50)
-  password String   @db.VarChar(300)
-  nickname String   @unique @db.VarChar(20)
-  profile  String   @default("/media/images/gc.png")
-  Record   Record[]
+  id                 Int      @id @unique @default(autoincrement())
+  email              String   @unique @db.VarChar(50)
+  password           String   @db.VarChar(300)
+  nickname           String   @unique @db.VarChar(20)
+  profile            String   @default("/media/images/gc.png")
+  isSocialAccount    Boolean  @default(false) @map("is_social_account")
+  socialProvider     Provider @default(LOCAL) @map("social_provider")
+  externalId         String?  @unique @map("external_id")
+  socialRefreshToken String?  @map("social_refresh_token")
+  Record             Record[]
 }
 
 model Record {
@@ -40,4 +44,9 @@ model Image {
   imageUrl String @map("img_url")
   recordId String @map("record_id") @db.Uuid
   Record   Record @relation(fields: [recordId], references: [id], onDelete: Cascade)
+}
+
+enum Provider {
+  LOCAL
+  GOOGLE
 }

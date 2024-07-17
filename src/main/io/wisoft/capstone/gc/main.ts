@@ -1,6 +1,7 @@
 import { AppModule } from "@gc/app.module";
 import { basicAuthConfig } from "@gc/configure/basic-auth.config";
 import { corsConfig } from "@gc/configure/cors.config";
+import { sessionConfig } from "@gc/configure/session.config";
 import { staticAssetsConfig } from "@gc/configure/static-assets.config";
 import { swaggerConfig } from "@gc/configure/swagger.config";
 import { NestFactory } from "@nestjs/core";
@@ -13,6 +14,7 @@ async function bootstrap(): Promise<void> {
   corsConfig(app);
   swaggerConfig(app);
   staticAssetsConfig(app);
+  sessionConfig(app);
 
   await app.listen(3000);
 }
