@@ -14,12 +14,13 @@ datasource db {
 }
 
 model User {
-  id       Int      @id @unique @default(autoincrement())
-  email    String   @unique @db.VarChar(50)
-  password String   @db.VarChar(300)
-  nickname String   @unique @db.VarChar(20)
-  profile  String   @default("/media/images/gc.png")
-  Record   Record[]
+  id          Int           @id @unique @default(autoincrement())
+  email       String        @unique @db.VarChar(50)
+  password    String        @db.VarChar(300)
+  nickname    String        @unique @db.VarChar(20)
+  profile     String        @default("/media/images/gc.png")
+  Record      Record[]
+  PloggingMap PloggingMap[]
 }
 
 model Record {
@@ -40,4 +41,20 @@ model Image {
   imageUrl String @map("img_url")
   recordId String @map("record_id") @db.Uuid
   Record   Record @relation(fields: [recordId], references: [id], onDelete: Cascade)
+}
+
+model MarkerData {
+  id            String      @id @unique
+  lat           Float       @db.DoublePrecision
+  lng           Float       @db.DoublePrecision
+  ploggingMapId String
+  PloggingMap   PloggingMap @relation(fields: [ploggingMapId], references: [id], onDelete: Cascade)
+  imageUrl      String      @map("img_url")
+}
+
+model PloggingMap {
+  id         String       @id @unique
+  email      String       @unique
+  User       User         @relation(fields: [email], references: [email], onDelete: Cascade)
+  MarkerData MarkerData[]
 }
