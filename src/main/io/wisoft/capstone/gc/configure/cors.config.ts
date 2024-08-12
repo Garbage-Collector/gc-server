@@ -7,6 +7,8 @@ export function corsConfig(app: NestExpressApplication): void {
     origin: [
       `http://localhost:${process.env.GC_WEB_SPA}`,
       `http://localhost:${process.env.GC_WEB_PWA}`,
+      `https://localhost:${process.env.GC_WEB_SPA}`,
+      `https://localhost:${process.env.GC_WEB_PWA}`,
       `${process.env.GC_WEB_BUCKET}`,
     ],
     methods: "GET, POST, PUT, PATCH, DELETE",
