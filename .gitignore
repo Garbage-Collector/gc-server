@@ -3,7 +3,7 @@
 /node_modules
 .env
 prisma/migrations
-*/uploads/images
+src/main/io/wisoft/capstone/gc/uploads/images
 
 # Logs
 logs
