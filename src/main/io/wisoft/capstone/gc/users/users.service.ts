@@ -17,6 +17,8 @@ import { copyToSrcUpload } from "@gc/utils/image.copy";
 import { HttpStatus, Injectable } from "@nestjs/common";
 import { PrismaClient } from "@prisma/client";
 import * as bcrypt from "bcrypt";
+import { UsersUpdatePasswordInMainPageRequestDto } from "@gc/users/dtos/users.update.password.in.main.page.request.dto";
+import { UsersUpdatePasswordInMainPageResponseDto } from "@gc/users/dtos/users.update.password.in.main.page.response.dto";
 
 /**
  * 240604: 아래 new PrismaClient() 부분에 대한 처리 고민 필요해보임
@@ -116,6 +118,27 @@ export class UsersService {
     const updatedUser = await prisma.user.update({
       where: {
         email: this.jwtService.extractEmailFromToken(rawToken),
+      },
+      data: {
+        password: await bcrypt.hash(usersUpdatePasswordRequestDto.password, 10),
+      },
+    });
+
+    if (!updatedUser) {
+      throw new Error("User not found");
+    }
+
+    return {
+      password: updatedUser.password,
+    };
+  }
+
+  async updatePasswordInMainPage(
+    usersUpdatePasswordRequestDto: UsersUpdatePasswordInMainPageRequestDto,
+  ): Promise<UsersUpdatePasswordInMainPageResponseDto> {
+    const updatedUser = await prisma.user.update({
+      where: {
+        email: usersUpdatePasswordRequestDto.email,
       },
       data: {
         password: await bcrypt.hash(usersUpdatePasswordRequestDto.password, 10),

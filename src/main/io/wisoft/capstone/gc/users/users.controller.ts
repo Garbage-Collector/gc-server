@@ -39,6 +39,8 @@ import {
   ApiOperation,
   ApiTags,
 } from "@nestjs/swagger";
+import { UsersUpdatePasswordInMainPageRequestDto } from "@gc/users/dtos/users.update.password.in.main.page.request.dto";
+import { UsersUpdatePasswordInMainPageResponseDto } from "@gc/users/dtos/users.update.password.in.main.page.response.dto";
 
 @Controller("/api/users")
 @ApiTags("User API")
@@ -113,6 +115,13 @@ export class UsersController {
     @Headers("authorization") rawToken: string,
   ): Promise<UsersUpdatePasswordResponseDto> {
     return await this.usersService.updatePassword(usersUpdateDto, rawToken);
+  }
+
+  @Patch("forgot-password")
+  async updateUserPasswordInMain(
+    @Body() usersUpdateDto: UsersUpdatePasswordInMainPageRequestDto,
+  ): Promise<UsersUpdatePasswordInMainPageResponseDto> {
+    return await this.usersService.updatePasswordInMainPage(usersUpdateDto);
   }
 
   @Post("password-check")
