@@ -9,13 +9,23 @@ import { UsersController } from "./users/users.controller";
 import { UsersModule } from "./users/users.module";
 import { UsersService } from "./users/users.service";
 import { ConfigModule } from "@nestjs/config";
+import { ServeStaticModule } from "@nestjs/serve-static";
+import { join } from "node:path";
 
 @Module({
-  imports: [ConfigModule.forRoot({
-	  envFilePath: './.env',
-	  isGlobal: true,
-  }),
-  RecordsModule, UsersModule, MailModule, JwtModule],
+  imports: [
+    ConfigModule.forRoot({
+      envFilePath: "./.env",
+      isGlobal: true,
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, ".."),
+    }),
+    RecordsModule,
+    UsersModule,
+    MailModule,
+    JwtModule,
+  ],
   controllers: [AppController, UsersController],
   providers: [AppService, UploadsService, UsersService],
 })
