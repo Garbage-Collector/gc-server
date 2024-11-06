@@ -3,6 +3,6 @@ import { NestExpressApplication } from "@nestjs/platform-express";
 
 export function staticAssetsConfig(app: NestExpressApplication): void {
   app.useStaticAssets(path.join(__dirname, "../uploads"), {
-    prefix: "/media",
+    prefix: "/gc/media",
   });
 }
