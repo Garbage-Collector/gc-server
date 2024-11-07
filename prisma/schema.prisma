@@ -20,6 +20,20 @@ model User {
   nickname String   @unique @db.VarChar(20)
   profile  String   @default("/media/images/gc.png")
   Record   Record[]
+  Passkey  Passkey?
+}
+
+model Passkey {
+  id             String               @id @db.VarChar(255)
+  publicKey      Bytes
+  userId         Int                  @unique
+  webauthnUserID String               @unique @db.VarChar(255) // Base64URLString
+  counter        BigInt
+  deviceType     CredentialDeviceType
+  backedUp       Boolean
+  transports     String[]
+
+  user User @relation(fields: [userId], references: [id])
 }
 
 model Record {
@@ -40,4 +54,19 @@ model Image {
   imageUrl String @map("img_url")
   recordId String @map("record_id") @db.Uuid
   Record   Record @relation(fields: [recordId], references: [id], onDelete: Cascade)
+}
+
+enum CredentialDeviceType {
+  singleDevice
+  multiDevice
+}
+
+enum AuthenticatorTransportFuture {
+  ble
+  cable
+  hybrid
+  internal
+  nfc
+  smartcard
+  usb
 }

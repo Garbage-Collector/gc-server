@@ -9,13 +9,14 @@ import { UsersController } from "./users/users.controller";
 import { UsersModule } from "./users/users.module";
 import { UsersService } from "./users/users.service";
 import { ConfigModule } from "@nestjs/config";
+import { PasskeyModule } from './passkey/passkey.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
 	  envFilePath: './.env',
 	  isGlobal: true,
   }),
-  RecordsModule, UsersModule, MailModule, JwtModule],
+  RecordsModule, UsersModule, MailModule, JwtModule, PasskeyModule],
   controllers: [AppController, UsersController],
   providers: [AppService, UploadsService, UsersService],
 })
