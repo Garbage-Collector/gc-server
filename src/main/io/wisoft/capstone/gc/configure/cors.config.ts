@@ -4,11 +4,7 @@ import { NestExpressApplication } from "@nestjs/platform-express";
 
 export function corsConfig(app: NestExpressApplication): void {
   const corsOptions: CorsOptions = {
-    origin: [
-      `http://localhost:${process.env.GC_WEB_SPA}`,
-      `http://localhost:${process.env.GC_WEB_PWA}`,
-      `${process.env.GC_WEB_BUCKET}`,
-    ],
+    origin: true,
     methods: "GET, POST, PUT, PATCH, DELETE",
   };
 

@@ -8,7 +8,7 @@ import {
 import { PublicKeyCredentialCreationOptionsJSON } from "@simplewebauthn/types";
 import { PasskeyService } from "@gc/passkey/passkey.service";
 
-@Controller("api/passkey")
+@Controller("gc/api/passkey")
 export class PasskeyController {
   constructor(private readonly passkeyService: PasskeyService) {}
   @Get("register")

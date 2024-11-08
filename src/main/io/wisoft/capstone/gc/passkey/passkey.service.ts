@@ -13,9 +13,9 @@ import {
 } from "@simplewebauthn/types";
 
 const rpName = "Garbage Collector";
-const rpID = "localhost";
+const rpID = "capstone.wisoft.io";
 const port = 3001;
-const origin = `http://${rpID}:${port}`;
+const origin = `https://${rpID}`;
 
 const prisma = new PrismaClient();
 
@@ -24,6 +24,7 @@ export class PasskeyService {
   private challenge: string;
   private userId: string;
   private authenticationChallenge: string;
+  private id: number;
 
   // 옵션 설정 GET
   async options(email: string) {
@@ -32,6 +33,8 @@ export class PasskeyService {
         email: email,
       },
     });
+
+    this.id = user.id;
 
     const userPasskeys = await prisma.passkey.findMany({
       where: { userId: user.id },
@@ -86,13 +89,13 @@ export class PasskeyService {
       console.error(error);
     }
     if (verification.verified) {
-      await this.createPasskey(verification);
+      await this.createPasskey(verification, this.id);
     }
 
     return verification;
   }
 
-  async createPasskey(verification: any) {
+  async createPasskey(verification: any, userId: any) {
     const { registrationInfo } = verification;
     const { credential, credentialDeviceType, credentialBackedUp } =
       registrationInfo;
@@ -103,7 +106,7 @@ export class PasskeyService {
         data: {
           id: credential.id, // Base64URLString
           publicKey: credential.publicKey, // Uint8Array -> Bytes로 저장
-          userId: 4, // 외래 키로 사용자 ID
+          userId: userId, // 외래 키로 사용자 ID
           webauthnUserID: this.userId, // Base64URLString
           counter: credential.counter, // BigInt
           deviceType: credentialDeviceType, // CredentialDeviceType

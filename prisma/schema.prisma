@@ -20,13 +20,13 @@ model User {
   nickname String   @unique @db.VarChar(20)
   profile  String   @default("/media/images/gc.png")
   Record   Record[]
-  Passkey  Passkey?
+  Passkey  Passkey[]
 }
 
 model Passkey {
   id             String               @id @db.VarChar(255)
   publicKey      Bytes
-  userId         Int                  @unique
+  userId         Int                  //@unique 
   webauthnUserID String               @unique @db.VarChar(255) // Base64URLString
   counter        BigInt
   deviceType     CredentialDeviceType
