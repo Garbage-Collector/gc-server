@@ -40,7 +40,7 @@ export class JwtService {
 
     return this.jwtService.sign(payload, {
       secret: process.env.JWT_SECRET,
-      expiresIn: isRefreshToken ? "1h" : "10m", // string format for clarity
+      expiresIn: isRefreshToken ? "5h" : "3h", // string format for clarity
     });
   }
 
