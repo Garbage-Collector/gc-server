@@ -12,7 +12,7 @@ import {
 } from "@simplewebauthn/types";
 import { PasskeyService } from "@gc/passkey/passkey.service";
 
-@Controller("gc/api/passkey")
+@Controller("/api/passkey")
 // @Controller("api/passkey")
 export class PasskeyController {
   constructor(private readonly passkeyService: PasskeyService) {}
