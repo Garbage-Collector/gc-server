@@ -69,6 +69,33 @@ export class RecordsService {
     }
   }
 
+  // 다른 유저 Record 조회 (무작위, 10개 제한)
+  async getDiffUserRecords(
+    userId: number,
+  ): Promise<RecordsGetRecordResponseDto[]> {
+    try {
+      const records = await prisma.record.findMany({
+        where: {
+          userId: {
+            not: userId,
+          },
+        },
+        include: {
+          image: {
+            select: {
+              id: true,
+              imageUrl: true,
+            },
+          },
+        },
+      });
+
+      return records.sort(() => Math.random() - 0.5).slice(0, 10);
+    } catch (error) {
+      throw new Error("기록 랜덤 조회 실패");
+    }
+  }
+
   // 기록 단건 조회
   async getRecord(
     userId: number,
