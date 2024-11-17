@@ -88,6 +88,14 @@ export class RecordsController {
     return await this.recordService.getAllRecords(Number.parseInt(param));
   }
 
+  @Get("/diff/:userId")
+  @UseGuards(AccessTokenGuard)
+  async getDiffUserRecords(
+    @Param("userId") param: string,
+  ): Promise<RecordsGetRecordResponseDto[]> {
+    return await this.recordService.getDiffUserRecords(Number.parseInt(param));
+  }
+
   // 기록 단건 조회
   @Get("/:userId/:recordId")
   @UseGuards(AccessTokenGuard)
